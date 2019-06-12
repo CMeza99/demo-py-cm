@@ -1,6 +1,8 @@
-""" __main__ to load package {{ cookiecutter.project_name }} as module """
+""" __main__ to load package cm as module """
 import logging
 import sys
+
+from . import cli
 
 
 def main():
@@ -9,7 +11,7 @@ def main():
     """
     module_args = sys.argv[1:]
     logging.debug("Module arguments received: %s", module_args)
-    {{ cookiecutter.project_slug }}.cli.main()
+    cli.main()
 
 
 if __name__ == "__main__":
