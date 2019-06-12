@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+# Abstract dependancies of this package should be maintained in setup.cfg.
+# Concrete dependancies should be defined here.
+# see, https://packaging.python.org/discussions/install-requires-vs-requirements/
+sample = {editable = true, path = "."}
+
+[dev-packages]
+better_exceptions = {version="*", index="pypi"}
+twine = {version="*", index="pypi"}
+
+[requires]
+# Can define a specific verions of Python.
+python_version = "3.7"
+
+[scripts]
+build = "python setup.py sdist bdist_wheel"
+cleanup = "sh -c 'rm -rf -- pip-wheel-metadata build/ dist/ .eggs/ src/*.egg-info .tox/'"
+publish = "twine upload -r testpypi dist/*"
