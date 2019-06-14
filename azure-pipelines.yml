@@ -32,6 +32,7 @@ stages:
         Package: 'pkg'
         Type: 'type'
         Security: 'sec'
+        Integration: 'testinfra'
 
 - stage: 'PyTest'
   dependsOn: []
