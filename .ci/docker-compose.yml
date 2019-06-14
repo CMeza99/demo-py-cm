@@ -1,0 +1,44 @@
+---
+version: "3.7"
+services:
+  tox:
+    image: local/tox:${PY:-python}${PY_VER:-latest}${IMG_VARIANT}
+    depends_on:
+    - ubuntu
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PY: ${PY:-python}
+        PY_VER: ${PY_VER:-latest}
+        IMG_VARIANT: ${IMG_VARIANT}
+    environment:
+      TOXENV: ${TOXENV}
+      PYTEST_XDIST_PROC_NR: ${PYTEST_XDIST_PROC_NR:-auto}
+    volumes:
+    - type: bind
+      source: ..
+      target: /mnt/pyproject
+    - type: bind
+      source: ./ssh
+      target: /root/.ssh
+  ubuntu:
+    image: local/ubuntu:${UBUNTU_VER:-trusty}
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu
+      args:
+        VER: ${UBUNTU_VER:-trusty}
+    expose:
+    - 22
+  local:
+      image: local/ubuntu:${UBUNTU_VER:-trusty}
+      build:
+          dockerfile: Dockerfile.ubuntu
+          context: .
+          args:
+              VER: ${UBUNTU_VER:-trusty}
+      expose:
+          - 22
+      ports:
+      - "22:22"

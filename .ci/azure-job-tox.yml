@@ -1,0 +1,45 @@
+---
+parameters:
+  name: null
+  vmImage: 'ubuntu-latest'
+  vars: {}
+  pytest: False
+  toxargs: '--skip-missing-interpreters false'
+  toxenvs: {}
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  variables: ${{ parameters.vars }}
+  strategy:
+    matrix:
+      ${{ each toxenv in parameters.toxenvs }}:
+        ${{ toxenv.key }}:
+          TOXENV: ${{ toxenv.value }}
+          ${{ if eq(parameters.pytest, True) }}:
+            PY_VER: ${{ toxenv.key }}
+
+  steps:
+  - script: 'docker-compose --file tests/docker-compose.yml build'
+    displayName: 'Build container'
+  - script: 'docker-compose --file tests/docker-compose.yml run tox ${{ parameters.toxargs }} --'
+    displayName: 'Run Tox'
+    env:
+      PYTEST_XDIST_PROC_NR: 2
+
+  - task: PublishTestResults@2
+    # displayName: publish test results via junit
+    enabled: ${{ parameters.pytest }}
+    inputs:
+      testResultsFormat: "JUnit"
+      testResultsFiles: '$(System.DefaultWorkingDirectory)/**/pytest-$(TOXENV).junit.xml'
+      testRunTitle: 'Publish test results for $(Agent.OS)-$(Agent.OSArchitecture)-$(TOXENV)'
+
+  - task: PublishCodeCoverageResults@1
+    enabled: ${{ parameters.pytest }}
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage-$(TOXENV).xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov-$(TOXENV)'
+      failIfCoverageEmpty: True

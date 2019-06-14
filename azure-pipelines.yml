@@ -1,0 +1,62 @@
+---
+name: $(BuildDefinitionName)_$(Date:yyyyMMdd)$(Rev:.rr)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
+    - refs/tags/*
+pr:
+  branches:
+    include:
+    - master
+
+variables:
+  PY_VER: '3.7'
+  IMG_VARIANT: '-slim'
+
+# Do not depend on platform enviroment
+# https://hynek.me/articles/simple-python-azure-pipelines/
+# Also more easily repoducable on local machine
+stages:
+
+- stage: 'Tox'
+  jobs:
+  - template: .ci/azure-job-tox.yml
+    parameters:
+      name: 'Env'
+      toxenvs:
+        Lint: 'lint'
+        Style: 'style'
+        Package: 'pkg'
+        Type: 'type'
+        Security: 'sec'
+
+- stage: 'PyTest'
+  dependsOn: []
+  jobs:
+  - template: .ci/azure-job-tox.yml
+    parameters:
+      name: 'Py'
+      pytest: True
+      toxenvs:
+        3.7: 'py37'
+        3.8-rc: 'py38'
+  - template: .ci/azure-job-tox.yml
+    parameters:
+      name: 'Py_musl'
+      pytest: True
+      toxenvs:
+        3.7: py37
+        3.8-rc: 'py38'
+      vars:
+        IMG_VARIANT: '-alpine'
+
+- stage: 'Publish'
+  jobs:
+  - job: 'Package'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - script: echo 'TODO - python setup wheel && twine'
