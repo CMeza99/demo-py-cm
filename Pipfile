@@ -19,6 +19,18 @@ python_version = "3.7"
 
 [scripts]
 build = "python setup.py sdist bdist_wheel"
-cleanup = "sh -c 'rm -rf -- pip-wheel-metadata build/ dist/ .eggs/ src/*.egg-info .tox/'"
-dockertox = "docker-compose --file tests/docker-compose.yml run --rm tox"
+cleanup = """
+  sh -c '\
+    if command -v docker-compose > /dev/null; then \
+      [ "$(find . -user 0)" ] &&\
+        docker-compose --file .ci/docker-compose.yml run --rm --entrypoint "bash -c" tox \
+          "chown -R $(ls -nd | cut -d " " -f 3) ." ;\
+      docker-compose --file .ci/docker-compose.yml build ;\
+      docker-compose --file .ci/docker-compose.yml rm --stop -v --force ;\
+    fi ;\
+    rm -rf -- pip-wheel-metadata build/ dist/ .eggs/ src/*.egg-info .tox/'"""
+# cleanup = """
+#   sh -c 'command -v docker-compose > /dev/null && docker-compose --file .ci/docker-compose.yml rm --stop -v --force ;\
+#   rm -rf -- pip-wheel-metadata build/ dist/ .eggs/ src/*.egg-info .tox/'"""
 publish = "twine upload -r testpypi dist/*"
+tests = "docker-compose --file .ci/docker-compose.yml run --rm tox"

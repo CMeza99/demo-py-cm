@@ -3,7 +3,8 @@ ARG  PY_VER=latest
 ARG  IMG_VARIANT=
 FROM ${PY}:${PY_VER}${IMG_VARIANT}
 
-ENV PYTEST_XDIST_PROC_NR=auto
+ENV PYTEST_XDIST_PROC_NR=auto \
+    TOX_WORK_DIR=/root/.tox
 
 RUN set -ex &&\
     OS="$(grep '^ID=' /etc/os-release | sed 's/ID=\(.*\)/\1/')" &&\
