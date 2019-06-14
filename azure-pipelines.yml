@@ -61,3 +61,10 @@ stages:
       vmImage: 'Ubuntu-16.04'
     steps:
     - script: echo 'TODO - python setup wheel && twine'
+    - script: exit 1
+  - job: 'Deploy'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    steps:
+    - script: echo 'TODO - cm <STATE> <AWS_INSTANCES>...'
+    - script: exit 1
