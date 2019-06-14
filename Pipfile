@@ -20,4 +20,5 @@ python_version = "3.7"
 [scripts]
 build = "python setup.py sdist bdist_wheel"
 cleanup = "sh -c 'rm -rf -- pip-wheel-metadata build/ dist/ .eggs/ src/*.egg-info .tox/'"
+dockertox = "docker-compose --file tests/docker-compose.yml run --rm tox"
 publish = "twine upload -r testpypi dist/*"
