@@ -7,7 +7,7 @@ name = "pypi"
 # Abstract dependancies of this package should be maintained in setup.cfg.
 # Concrete dependancies should be defined here.
 # see, https://packaging.python.org/discussions/install-requires-vs-requirements/
-sample = {editable = true, path = "."}
+cm = {editable = true, path = "."}
 
 [dev-packages]
 better_exceptions = {version="*", index="pypi"}
