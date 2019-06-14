@@ -24,8 +24,8 @@ class Pkg(State):
 
     def _cmd(self, host, subcommand="install"):
         _LOG.debug("%s %s on %s", subcommand, self.name, host.name)
-        _, stdout, stderr = host.runcmd(f"apt-get -qq update")
-        _, stdout, stderr = host.runcmd(f"apt-get -qq {subcommand} -y {self.name}")
+        _, stdout, stderr = host.runcmd(f"DEBIAN_FRONTEND=noninteractive apt-get -qq update")
+        _, stdout, stderr = host.runcmd(f"DEBIAN_FRONTEND=noninteractive apt-get -qq {subcommand} -y {self.name}")
         # TODO: Remove blocking for exit code
         self.exitcode = stdout.channel.recv_exit_status()
         self.error = stderr.readlines()
@@ -39,11 +39,11 @@ class Pkg(State):
 
     def install(self, host):
         # TODO cache running `apt-get update`
-        self._cmd(host, "install")
+        return self._cmd(host, "install")
 
     def run(self, host):
         if not self.isinstalled(host):
-            if self.install(host) == 0:
+            if self.install(host) is 0:
                 self.modified = True
         else:
             self.exitcode = 0
